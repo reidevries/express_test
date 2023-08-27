@@ -36,11 +36,12 @@ function authenticate(name, password, fn) {
 	hash(
 		{ password: password, salt: user.salt },
 		function (err, password, salt, hash)
-	{
-		if (err) return fn(err)
-		if (hash === user.hash) return fn(null, user)
-		fn(null, null)
-	});
+		{
+			if (err) return fn(err)
+			if (hash === user.hash) return fn(null, user)
+			fn(null, null)
+		}
+	);
 }
 
 function restrict(req, res, next) {
@@ -67,7 +68,23 @@ router.get('/logout', function(req, res) {
 
 /* GET login page */
 router.get('/login', function(req, res) {
-	res.render('login');
+	if (req.session.user) {
+		res.render(
+			'login',
+			{
+				message: 'Currently logged in as ' + req.session.user.name
+					+ '!',
+				foot: '<a href="/auth/logout">logout</a>.' 
+			}
+		);
+	} else {
+		res.render(
+			'login',
+			{
+				message: 'Not logged in.'
+			}
+		);
+	}
 });
 
 /* POST login details to authenticate */
