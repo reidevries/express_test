@@ -8,11 +8,8 @@ function query(query_str, callback) {
 		password: "",
 		port: 5432,
 	});
-	pool.query(query_str, (error, results)) => {
-		callback({
-			error: error,
-			results: results ? results : null,
-		});
+	pool.query(query_str, (err, res) => {
+		callback(err, res ? res : null);
 	});
 }
 

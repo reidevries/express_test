@@ -29,9 +29,15 @@ app.use(session({
 	secret: 'shhh, very secret'
 }));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/auth', authRouter);
+pg_pool = require('./db/pg_wrapper');
+db_users = require('./db/users')(pg_pool); 
+hasher = require('pbkdf2-password')();
+authenticator = require('./auth/auth.js')(hasher, db_users);
+
+router = express.Router();
+app.use('/', indexRouter(router));
+app.use('/users', usersRouter(router));
+app.use('/auth', authRouter(router, authenticator));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
